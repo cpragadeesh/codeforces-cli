@@ -1,0 +1,2 @@
+# codeforces-cli
+Codeforces CLI

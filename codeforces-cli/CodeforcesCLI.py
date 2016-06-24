@@ -1,5 +1,5 @@
 import sys
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, call
 from CodeforcesComms import CodeforcesComms
 from Parser import Parser
 
@@ -11,7 +11,7 @@ class CodeforcesCLI(object):
         self.file_name = file_name
         self.lang = lang
         self.compiler = compiler
-        self.test_cases = []
+        self.test_cases = []            #Each test case is a pair [input, output]
         self.test_case_files = []
         self.contest_id = None
         self.problem_id = None
@@ -56,12 +56,16 @@ class CodeforcesCLI(object):
     def fetch_test_cases(self):
         page = self.comms.open_problem_page()
         self.test_cases = self.parser.get_test_cases(page)
-        # folder_name = self.contest_id + self.problem_id + "_testcases/"
-        # subprocess.call(['mkdir', folder_name])
-        #
-        # for case, i in zip(test_cases, range(0, len(test_cases)):
-        #     f = open(folder + str(i), "w+")
-        #     f.write(case)
+        folder_name = self.contest_id + self.problem_id + "_testcases/"
+
+        #check if directory already exists
+        proc = Popen("ls | grep " + folder_name)
+        Popen(['mkdir', folder_name])
+
+        for case, i in zip(self.test_cases, range(0, len(test_cases))):
+            f = open(folder + str(i), "w+")
+            f.write(case)
+            f.close()
 
     def run(self):
         self.compile()

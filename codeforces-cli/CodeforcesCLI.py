@@ -7,8 +7,12 @@ DIVIDER = "---------------------------------------------------------------------
 
 class CodeforcesCLI(object):
     """Main cli class"""
-    def __init__(self, file_name, lang = "c++", compiler = "c++"):
-        self.file_name = file_name
+    def __init__(self, file_location, lang = "c++", compiler = "c++"):
+        self.file_location = file_location
+        self.file_name = None
+        self.file_extn = None
+        self.file_output = None
+        self.file_output_extn = None
         self.lang = lang
         self.compiler = compiler
         self.test_cases = []            #Each test case is a pair [input, output]
@@ -18,34 +22,45 @@ class CodeforcesCLI(object):
         self.comms = CodeforcesComms()
         self.parser = Parser()
 
+        if(lang == "c++"):
+            self.file_output_extn = ".out"
+
     def __config_comms(self, username = None, password = None):
         self.comms.contest_id = str(self.contest_id)
         self.comms.problem_id = str(self.problem_id)
         self.comms.username = username
         self.comms.password = password
 
-    def __parse_file_name(self):
+    def parse_file_name(self):
 
-        contest_id_end = self.file_name.find(".")
-        contest_id_end = contest_id_end - 1
+        file_name_start = len(self.file_location) - 1
+        while(self.file_location[file_name_start] != '/' and file_name_start != -1):
+            file_name_start -= 1
+
+        file_name_start += 1
+        self.file_name = self.file_location[file_name_start : self.file_location.find(".", file_name_start)]
+        self.file_extn = self.file_location[self.file_location.find(".", file_name_start) + 1 : ]
+
+        contest_id_end = len(self.file_name) - 1
 
         self.contest_id = self.file_name[ :contest_id_end]
         self.problem_id = self.file_name[contest_id_end: contest_id_end + 1]
 
-        self.__config_comms()
+        self.file_output = self.file_name + self.file_output_extn
 
         return 0
 
     def compile(self):
 
         print DIVIDER
-        print "Compiling " + self.file_name + " using " + self.compiler
-        compilation = Popen([self.compiler, self.file_name])
+        print "Compiling " + self.file_location + " using " + self.compiler
+
+        compilation = Popen([self.compiler, self.file_location,  "-o", self.file_output])
         compilation_output = compilation.communicate()
 
         if compilation.returncode == 0:
             print "Compilation successful!"
-            print "Output file: " + "a.out"
+            print "Output file: " + self.file_output
 
         print DIVIDER
 
@@ -56,7 +71,8 @@ class CodeforcesCLI(object):
         pass_count = 0
 
         for case in self.test_cases:
-            proc = Popen(['./a.out'], stdout = PIPE, stdin = PIPE)
+            print "./" + self.file_output
+            proc = Popen(["./" + self.file_output], stdout = PIPE, stdin = PIPE)
             out = proc.communicate(case[0].strip())
             print "Input: "
             print case[0].strip()
@@ -82,9 +98,12 @@ class CodeforcesCLI(object):
             return 1
 
     def fetch_test_cases(self):
-        self.__parse_file_name()
-        print "Fetching test cases for problem " + self.contest_id + self.problem_id
-        page = self.comms.open_problem_page()
+
+        if self.file_name == None:
+            self.parse_file_name()
+
+        print "\nFetching test cases for problem " + self.contest_id + self.problem_id
+        page = self.comms.open_problem_page(self.contest_id, self.problem_id)
         self.test_cases = self.parser.get_test_cases(page)
         print "Test cases fetching successful."
 
@@ -110,8 +129,10 @@ class CodeforcesCLI(object):
         print DIVIDER
 
     def run(self):
+        self.parse_file_name()
         self.compile()
         self.fetch_test_cases()
         #self.write_test_cases_to_file()
         self.run_all_test_cases()
-        print self.test_cases
+
+        return 0

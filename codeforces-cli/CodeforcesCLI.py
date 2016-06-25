@@ -7,7 +7,7 @@ DIVIDER = "---------------------------------------------------------------------
 
 class CodeforcesCLI(object):
     """Main cli class"""
-    def __init__(self, file_location, lang = "c++", compiler = "c++"):
+    def __init__(self, file_location, compiler = "g++", lang = "c++"):
         self.file_location = file_location
         self.file_name = None
         self.file_extn = None
@@ -33,22 +33,25 @@ class CodeforcesCLI(object):
 
     def parse_file_name(self):
 
-        file_name_start = len(self.file_location) - 1
-        while(self.file_location[file_name_start] != '/' and file_name_start != -1):
-            file_name_start -= 1
+        try:
+            file_name_start = len(self.file_location) - 1
+            while(self.file_location[file_name_start] != '/' and file_name_start != -1):
+                file_name_start -= 1
 
-        file_name_start += 1
-        self.file_name = self.file_location[file_name_start : self.file_location.find(".", file_name_start)]
-        self.file_extn = self.file_location[self.file_location.find(".", file_name_start) + 1 : ]
+            file_name_start += 1
+            self.file_name = self.file_location[file_name_start : self.file_location.find(".", file_name_start)]
+            self.file_extn = self.file_location[self.file_location.find(".", file_name_start) + 1 : ]
 
-        contest_id_end = len(self.file_name) - 1
+            contest_id_end = len(self.file_name) - 1
 
-        self.contest_id = self.file_name[ :contest_id_end]
-        self.problem_id = self.file_name[contest_id_end: contest_id_end + 1]
+            self.contest_id = self.file_name[ :contest_id_end]
+            self.problem_id = self.file_name[contest_id_end: contest_id_end + 1]
 
-        self.file_output = self.file_name + self.file_output_extn
+            self.file_output = self.file_name + self.file_output_extn
 
-        return 0
+            return 0
+        except:
+            return 1
 
     def compile(self):
 
@@ -99,13 +102,18 @@ class CodeforcesCLI(object):
 
     def fetch_test_cases(self):
 
-        if self.file_name == None:
-            self.parse_file_name()
+        try:
+            if self.file_name == None:
+                self.parse_file_name()
 
-        print "\nFetching test cases for problem " + self.contest_id + self.problem_id
-        page = self.comms.open_problem_page(self.contest_id, self.problem_id)
-        self.test_cases = self.parser.get_test_cases(page)
-        print "Test cases fetching successful."
+            print "\nFetching test cases for problem " + self.contest_id + self.problem_id
+            page = self.comms.open_problem_page(self.contest_id, self.problem_id)
+            self.test_cases = self.parser.get_test_cases(page)
+            print "Test cases fetching successful."
+
+            return 0
+        except:
+            return 1
 
     def write_test_cases_to_file(self):
         print "Saving test cases..."
@@ -129,9 +137,21 @@ class CodeforcesCLI(object):
         print DIVIDER
 
     def run(self):
-        self.parse_file_name()
-        self.compile()
-        self.fetch_test_cases()
+
+        retcode = self.parse_file_name()
+        if(retcode == 1):
+            print "Error parsing file name. Exiting."
+            return 1
+
+        retcode = self.compile()
+        if(retcode != 0):
+            print "Error compiling. Exiting."
+            return 1
+
+        retcode = self.fetch_test_cases()
+        if(retcode == 1):
+            print "Error fetching testcases. Exiting."
+            return 1
         #self.write_test_cases_to_file()
         self.run_all_test_cases()
 

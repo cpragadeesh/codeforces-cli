@@ -1,15 +1,14 @@
-#!/usr/bin/python
-
 from CodeforcesCLI import CodeforcesCLI
 import sys
 
 
 def print_usage():
     print "Usage: "
-    print "\tcodeforces-cli [test | submit] path-to-file [-c compiler]"
+    print "\tcfcli [-h] [test | submit] path-to-file [-c compiler]"
     print "\nNOTE: Filename must be of the following format 'contestIDproblemID', Example: 608a.cpp, 604b.cpp, 607a.py"
     print "      Performs tests if not mentioned by default."
     print "Options and arguments: "
+    print "-h           : Prints this message"
     print "test         : Execute your program against test cases fetched from codeforces"
     print "submit       : Submits your program to codeforces"
     print "path-to-file : Path to your source file"
@@ -19,6 +18,10 @@ def print_usage():
 def main():
 
     if len(sys.argv) < 2:
+        print_usage()
+        return 1
+
+    if "-h" in sys.argv:
         print_usage()
         return 1
 

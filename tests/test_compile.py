@@ -10,6 +10,7 @@ class TestCompile(unittest.TestCase):
         obj.file_name = "test_program"
         obj.file_extn = ".cpp"
         obj.file_output = "test_program.out"
+        subprocess.call(["rm", "test_program.out"])
         self.assertEqual(obj.compile(), 0)
 
 if __name__ == "__main__":

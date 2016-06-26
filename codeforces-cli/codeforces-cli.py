@@ -1,5 +1,8 @@
+#!/usr/bin/python
+
 from CodeforcesCLI import CodeforcesCLI
 import sys
+
 
 def print_usage():
     print "Usage: "
@@ -11,6 +14,7 @@ def print_usage():
     print "submit       : Submits your program to codeforces"
     print "path-to-file : Path to your source file"
     print "-c compiler  : Specify compiler to use. 'compiler' must be replaced with the compiler command you use, Example: g++, c++, javac, etc"
+
 
 def main():
 

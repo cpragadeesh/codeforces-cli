@@ -5,8 +5,10 @@ from Parser import Parser
 
 DIVIDER = "-------------------------------------------------------------------------"
 
+
 class CodeforcesCLI(object):
     """Main cli class"""
+
     def __init__(self, file_location, compiler = "g++", lang = "c++"):
         self.file_location = file_location
         self.file_name = None
@@ -39,6 +41,7 @@ class CodeforcesCLI(object):
                 file_name_start -= 1
 
             file_name_start += 1
+
             self.file_name = self.file_location[file_name_start : self.file_location.find(".", file_name_start)]
             self.file_extn = self.file_location[self.file_location.find(".", file_name_start) + 1 : ]
 
@@ -47,58 +50,73 @@ class CodeforcesCLI(object):
             self.contest_id = self.file_name[ :contest_id_end]
             self.problem_id = self.file_name[contest_id_end: contest_id_end + 1]
 
+            if(not self.problem_id.isalpha()):
+                self.problem_id = ""
+
             self.file_output = self.file_name + self.file_output_extn
 
-            return 0
+            if 0 in [len(self.file_name), len(self.contest_id), len(self.problem_id)]:
+                raise
+
         except:
+            raise RuntimeError("Looks like you are using wrong filename format. Correct examples: 308a.cpp, 668b.py")
             return 1
 
     def compile(self):
+        try:
+            print DIVIDER
+            print "Compiling " + self.file_location + " using " + self.compiler
 
-        print DIVIDER
-        print "Compiling " + self.file_location + " using " + self.compiler
+            compilation = Popen([self.compiler, self.file_location,  "-o", self.file_output])
+            compilation_output = compilation.communicate()
 
-        compilation = Popen([self.compiler, self.file_location,  "-o", self.file_output])
-        compilation_output = compilation.communicate()
-
-        if compilation.returncode == 0:
-            print "Compilation successful!"
-            print "Output file: " + self.file_output
-
-        print DIVIDER
-
-        return compilation.returncode
-
-    def run_all_test_cases(self):
-
-        pass_count = 0
-
-        for case in self.test_cases:
-            print "./" + self.file_output
-            proc = Popen(["./" + self.file_output], stdout = PIPE, stdin = PIPE)
-            out = proc.communicate(case[0].strip())
-            print "Input: "
-            print case[0].strip()
-            print "\nOutput: "
-            print out[0].strip()
-            print "\nExpected Output: "
-            print case[1].strip()
-
-            if(out[0].strip() == case[1].strip()):
-                print "\nVerdict: Pass"
-                pass_count += 1
-            else:
-                print "\nVerdict: Fail"
+            if compilation.returncode == 0:
+                print "Compilation successful!"
+                print "Output file: " + self.file_output
 
             print DIVIDER
 
-        print str(pass_count) + " of " + str(len(self.test_cases)) + " test cases Match."
-        print DIVIDER
+            return compilation.returncode
 
-        if(pass_count == len(self.test_cases)):
-            return 0
-        else:
+        except:
+            raise OSError("Error compiling your code. Specify the exact compiler path variables. Correct examples: ... -c g++ , ... -c python")
             return 1
+
+    def run_all_test_cases(self):
+
+        try:
+            pass_count = 0
+
+            for case in self.test_cases:
+                print "./" + self.file_output
+                proc = Popen(["./" + self.file_output], stdout = PIPE, stdin = PIPE)
+                out = proc.communicate(case[0].strip())
+                print "Input: "
+                print case[0].strip()
+                print "\nOutput: "
+                print out[0].strip()
+                print "\nExpected Output: "
+                print case[1].strip()
+
+                if(out[0].strip() == case[1].strip()):
+                    print "\nVerdict: Pass"
+                    pass_count += 1
+                else:
+                    print "\nVerdict: Fail"
+
+                print DIVIDER
+
+            print str(pass_count) + " of " + str(len(self.test_cases)) + " test cases Match."
+            print DIVIDER
+
+            if(pass_count != len(self.test_cases)):
+                raise
+
+            return 0
+
+        except:
+             RuntimeError("Error executing test cases.")
+             return 1
 
     def fetch_test_cases(self):
 
@@ -111,9 +129,8 @@ class CodeforcesCLI(object):
             self.test_cases = self.parser.get_test_cases(page)
             print "Test cases fetching successful."
 
-            return 0
         except:
-            return 1
+            raise RuntimeError("Error fetching test cases.")
 
     def write_test_cases_to_file(self):
         print "Saving test cases..."
@@ -138,21 +155,15 @@ class CodeforcesCLI(object):
 
     def run(self):
 
-        retcode = self.parse_file_name()
-        if(retcode == 1):
-            print "Error parsing file name. Exiting."
-            return 1
-
-        retcode = self.compile()
-        if(retcode != 0):
-            print "Error compiling. Exiting."
-            return 1
-
-        retcode = self.fetch_test_cases()
-        if(retcode == 1):
-            print "Error fetching testcases. Exiting."
-            return 1
-        #self.write_test_cases_to_file()
-        self.run_all_test_cases()
+        try:
+            self.parse_file_name()
+            self.compile()
+            self.fetch_test_cases()
+            #self.write_test_cases_to_file()
+            self.run_all_test_cases()
+        except RuntimeError as e:
+            print e
+        except OSError as e:
+            print e
 
         return 0

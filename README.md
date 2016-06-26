@@ -18,6 +18,7 @@ Run the following command:
     *NOTE: Contest ID is found in the URL of the problem. Contest ID is not same as Round Number.*
 
 2. To test you program:
+
     Run the following command:
 
       `cfcli test <path-to-file>`

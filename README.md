@@ -1,7 +1,9 @@
 #Codeforces Command Line Interface
 
 ##How to install:
-Run the following command:
+* Download from the latest release from [here](https://github.com/cpragadeesh/codeforces-cli/releases).
+* Unpack the file.
+* Run the following command:
 
   `python setup.py install`
 

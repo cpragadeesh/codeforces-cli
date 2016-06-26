@@ -32,7 +32,7 @@ Run the following command:
 
       `cfcli test 608a.cpp -c g++`
 
-Get more usage info by using the -h tag
+Get more usage info by using the -h option
 
     `cfcli -h`
 

@@ -1,5 +1,6 @@
 [Tt]humbs.db
 *.DS_Store
 
+./codeforcescli/*.out
 *.pyc
 __pycache__

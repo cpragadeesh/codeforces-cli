@@ -4,15 +4,18 @@ import sys
 
 def print_usage():
     print "Usage: "
-    print "\tcfcli [-h] [test | submit] path-to-file [-c compiler]"
+    print "\tcfcli action compiler path-to-file [compiler_options]"
     print "\nNOTE: Filename must be of the following format 'contestIDproblemID', Example: 608a.cpp, 604b.cpp, 607a.py"
     print "      Performs tests if not mentioned by default."
-    print "Options and arguments: "
-    print "-h           : Prints this message"
-    print "test         : Execute your program against test cases fetched from codeforces"
-    print "submit       : Submits your program to codeforces"
-    print "path-to-file : Path to your source file"
-    print "-c compiler  : Specify compiler to use. 'compiler' must be replaced with the compiler command you use, Example: g++, c++, javac, etc"
+    print "\nOptions and arguments: \n"
+    print "action takes the following values:"
+    print " -h : Prints this message"
+    print " -t : Execute your program against test cases fetched from codeforces"
+    print " -s : Submits your program to codeforces\n"
+    print "path-to-file      : Path to your source file"
+    print "compiler_options  : Optional compiler options"
+    print "\nExample: cfcli -t g++ 660a.cpp -std=c++14"
+
 
 
 def main():

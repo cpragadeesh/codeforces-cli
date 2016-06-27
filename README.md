@@ -17,22 +17,15 @@
     *Examples: 608a.cpp, 608b.cpp, 604b.py, 602.java*<br>
     *NOTE: Contest ID is found in the URL of the problem. Contest ID is not same as Round Number.*
 
-2. To test your program:<br>
+2. Testing your program:<br>
     Run the following command:
 
-      `cfcli test <path-to-file>`
+      `cfcli -t <compiler> <path-to-file> [<compiler_options>]`
 
    *Example:*
 
-      `cfcli test Documents/Codes/608a.cpp`
+      `cfcli -t g++ ~/Codes/608a.cpp -std=c++14`
 
-    You can choose your compiler by using -c tag. For example, If you compile your program using the following command:
-
-      `g++ 608a.cpp`
-
-    Then set the compiler by appending the "-c g++"
-
-      `cfcli test 608a.cpp -c g++`
 
 Get more usage info by using the -h option
 

@@ -17,19 +17,11 @@ How to use:
 2. To test you program:
     Run the following command:
 
-      cfcli test <path-to-file>
+      cfcli -t <compiler> <path-to-file> [<compiler_options>]
 
     Example:
 
-      cfcli test ~/Codes/608a.cpp
-
-    You can choose your compiler by using -c tag. For example, If you compile your program using the following command:
-
-      g++ 608a.cpp
-
-    Then set the compiler by appending the "-c g++"
-
-      cfcli test 608a.cpp -c g++
+      cfcli -t g++ ~/Codes/608a.cpp -std=c++14
 
 Get more usage info by using the -h tag
 

@@ -6,7 +6,7 @@ from context import CodeforcesCLI
 class TestFetch(unittest.TestCase):
     """Tests to test fetch_test_cases method"""
     def test_686a(self):
-        obj = CodeforcesCLI("686a.cpp")
+        obj = CodeforcesCLI("g++", "686a.cpp")
 
         obj.file_name = "686a"
         obj.file_extn = ".cpp"
@@ -18,7 +18,7 @@ class TestFetch(unittest.TestCase):
         self.assertEqual(obj.test_cases, valid_cases)
 
     def test_661b(self):
-        obj = CodeforcesCLI("661b.cpp")
+        obj = CodeforcesCLI("g++", "661b.cpp")
 
         obj.file_name = "661b"
         obj.file_extn = ".cpp"

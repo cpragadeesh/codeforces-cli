@@ -1,4 +1,5 @@
 import sys
+import os
 from subprocess import Popen, PIPE
 from CodeforcesComms import CodeforcesComms
 from Parser import Parser
@@ -9,14 +10,15 @@ DIVIDER = "---------------------------------------------------------------------
 class CodeforcesCLI(object):
     """Main cli class"""
 
-    def __init__(self, file_location, compiler = "g++", lang = "c++"):
+    def __init__(self, compiler, file_location, compiler_options = "", lang = "c++"):
         self.file_location = file_location
         self.file_name = None
         self.file_extn = None
-        self.file_output = None
+        self.file_output_name = None    #Includes output file extension
         self.file_output_extn = None
         self.lang = lang
         self.compiler = compiler
+        self.compiler_options = compiler_options
         self.test_cases = []            #Each test case is a pair [input, output]
         self.test_case_files = []
         self.contest_id = None
@@ -36,13 +38,9 @@ class CodeforcesCLI(object):
     def parse_file_name(self):
 
         try:
-            file_name_start = len(self.file_location) - 1
-            while(self.file_location[file_name_start] != '/' and file_name_start != -1):
-                file_name_start -= 1
+            file_name_start = self.file_location.rfind('/') + 1
 
-            file_name_start += 1
-
-            self.file_name = self.file_location[file_name_start : self.file_location.find(".", file_name_start)]
+            self.file_name = self.file_location[file_name_start : self.file_location.rfind('.')]
             self.file_extn = self.file_location[self.file_location.find(".", file_name_start) + 1 : ]
 
             contest_id_end = len(self.file_name) - 1
@@ -53,10 +51,10 @@ class CodeforcesCLI(object):
             if(not self.problem_id.isalpha()):
                 self.problem_id = ""
 
-            self.file_output = self.file_name + self.file_output_extn
-
             if 0 in [len(self.file_name), len(self.contest_id), len(self.problem_id)]:
                 raise
+
+            self.file_output_name = self.file_name + self.file_output_extn
 
         except:
             raise RuntimeError("Looks like you are using wrong filename format. Correct examples: 308a.cpp, 668b.py")
@@ -65,31 +63,43 @@ class CodeforcesCLI(object):
     def compile(self):
         try:
             print DIVIDER
-            print "Compiling " + self.file_location + " using " + self.compiler
+            print "Compiling " + self.file_name + "." + self.file_extn + " using " + self.compiler + " and options" + self.compiler_options
 
-            compilation = Popen([self.compiler, self.file_location,  "-o", self.file_output])
+            if len(self.compiler_options) > 0:
+                compilation = Popen([self.compiler, self.file_location,  "-o", self.file_output_name, self.compiler_options])
+            else:
+                compilation = Popen([self.compiler, self.file_location,  "-o", self.file_output_name])
+
             compilation_output = compilation.communicate()
 
             if compilation.returncode == 0:
                 print "Compilation successful!"
-                print "Output file: " + self.file_output
+                print "Output file: " + os.path.dirname(os.path.abspath(__file__)) + "/" + self.file_output_name
+
+            else:
+                raise RuntimeError("error")
 
             print DIVIDER
 
             return compilation.returncode
 
         except:
-            raise OSError("Error compiling your code. Specify the exact compiler path variables. Correct examples: ... -c g++ , ... -c python")
+            raise RuntimeError("Error compiling your code.")
             return 1
 
+
     def run_all_test_cases(self):
+
+        #Return codes:
+        # 0 - successful
+        # 1 - Wrong Answer
+        # 2 - Error executing
 
         try:
             pass_count = 0
 
             for case in self.test_cases:
-                print "./" + self.file_output
-                proc = Popen(["./" + self.file_output], stdout = PIPE, stdin = PIPE)
+                proc = Popen(["./" + self.file_output_name], stdout = PIPE, stdin = PIPE)
                 out = proc.communicate(case[0].strip())
                 print "Input: "
                 print case[0].strip()
@@ -110,13 +120,16 @@ class CodeforcesCLI(object):
             print DIVIDER
 
             if(pass_count != len(self.test_cases)):
-                raise
+                raise RuntimeError("Wrong answer")
 
             return 0
 
-        except:
+        except RuntimeError:
              RuntimeError("Error executing test cases.")
              return 1
+
+        except OSError:
+            RuntimeError("Error executing the program")
 
     def fetch_test_cases(self):
 
@@ -154,7 +167,6 @@ class CodeforcesCLI(object):
         print DIVIDER
 
     def run(self):
-
         try:
             self.parse_file_name()
             self.compile()
@@ -163,7 +175,9 @@ class CodeforcesCLI(object):
             self.run_all_test_cases()
         except RuntimeError as e:
             print e
+            return 1
         except OSError as e:
-            print e
+            print
+            return 1
 
         return 0

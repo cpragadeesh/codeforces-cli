@@ -17,33 +17,23 @@ def print_usage():
 
 def main():
 
-    if len(sys.argv) < 2:
+    if len(sys.argv) <= 3:
         print_usage()
         return 1
 
-    if "-h" in sys.argv:
+    action = sys.argv[1]
+    compiler = sys.argv[2]
+    file_location = sys.argv[3]
+    compiler_options = ""
+    if len(sys.argv) >= 4:
+        compiler_options = ' '.join(sys.argv[4: ])
+
+    if action == '-h':
         print_usage()
-        return 1
+        return 0
 
-    compiler = "g++"
-    file_location = None
-    action = "test"
-
-    if sys.argv[1] != "test" and sys.argv[1] != "submit":
-        file_location = sys.argv[1]
-    else:
-        file_location = sys.argv[2]
-
-    if "-c" in sys.argv:
-        index = sys.argv.index("-c")
-        if(index + 1 < len(sys.argv)):
-            compiler = sys.argv[index + 1]
-        else:
-            print_usage()
-            return 1
-
-    if(action == "test"):
-        obj = CodeforcesCLI(file_location, compiler)
+    if action == "-t":
+        obj = CodeforcesCLI(compiler, file_location, compiler_options)
         obj.run()
 
         return 0

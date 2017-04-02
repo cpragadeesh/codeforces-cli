@@ -29,7 +29,7 @@
 
 Get more usage info by using the -h option
 
-    `cfcli -h`
+`cfcli -h`
 
 <p align="center">
 <img src="http://i67.tinypic.com/2liu3w9.jpg"/>

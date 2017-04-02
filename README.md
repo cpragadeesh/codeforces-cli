@@ -1,6 +1,6 @@
-#Codeforces Command Line Interface
+# Codeforces Command Line Interface
 
-##How to install:
+## How to install:
 * Download from the latest release from [here](https://github.com/cpragadeesh/codeforces-cli/releases).
 * Unpack the file.
 * Run the following command:
@@ -9,7 +9,7 @@
 
  *NOTE: You need to be root to do this. Switch to root or use sudo.*
 
-##How to use:
+## How to use:
 1. Save your source file in the following format:<br>
     >ContestIDProblemID.extension
 
